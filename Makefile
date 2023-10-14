@@ -26,13 +26,13 @@ DOCKER_PULL_BASE_IMAGES_IGNORE = base
 TAG        = latest
 
 # Makefile.docker overwrites
-NAME       = OpenResty 
-VERSION    = alpine 
+NAME       = OpenResty
+VERSION    = alpine
 IMAGE      = bypanel/openresty
 FLAVOUR    = latest
 DIR        = Dockerfiles
 FILE       = Dockerfile.$(FLAVOUR)
-DOCKER_TAG = $(TAG) 
+DOCKER_TAG = $(TAG)
 ARCH       = linux/amd64
 
 
