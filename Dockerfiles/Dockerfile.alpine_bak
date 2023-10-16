@@ -1,0 +1,72 @@
+FROM openresty/openresty:alpine AS base
+
+ENV MY_USER=bypanel
+ENV MY_GROUP=bypanel
+
+# wget is required due to https://github.com/luarocks/luarocks/issues/952
+ARG PKG_DEPS="\
+        shadow \
+"
+ENV PKG_DEPS=$PKG_DEPS
+
+COPY --chown=1000:1000 tpl/docker-entrypoint.d /docker-entrypoint.d
+COPY --chown=1000:1000 tpl/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=1000:1000 tpl/docker-entrypoint.sh /
+COPY --chown=1000:1000 tpl/nginx.conf /etc/nginx/nginx.conf
+
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
+# hadolint ignore=SC2086
+RUN set -eux \
+    && apk update \
+    && apk add --no-cache --virtual .pkg_deps \
+        $PKG_DEPS \
+    && ln -s /usr/local/openresty/nginx/logs /var/log/nginx \
+    && ln -s /usr/local/openresty/nginx/conf/fastcgi.conf /etc/nginx/fastcgi.conf \
+    && ln -s /usr/local/openresty/nginx/conf/mime.types /etc/nginx/mime.types \
+    && ln -s /usr/local/openresty/nginx/conf/uwsgi_params /etc/nginx/uwsgi_params \
+    && ln -s /usr/local/openresty/nginx/conf/fastcgi_params /etc/nginx/fastcgi_params \
+    && rm -f /usr/local/openresty/nginx/conf/nginx.conf \
+    && ln -s /etc/nginx/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
+
+RUN set -x \
+# create nginx user/group first, to be consistent throughout docker variants
+    && addgroup -g 1000 -S $MY_GROUP \
+    && adduser -S -D -H -u 1000 -h /var/cache/nginx -s /sbin/nologin -G $MY_GROUP -g $MY_GROUP $MY_USER \
+    && apk add --no-cache --virtual .gettext gettext \
+    && mv /usr/bin/envsubst /tmp/ \
+    \
+    && runDeps="$( \
+        scanelf --needed --nobanner /tmp/envsubst \
+            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+            | sort -u \
+            | xargs -r apk info --installed \
+            | sort -u \
+    )" \
+    && apk add --no-cache $runDeps \
+    && apk del .gettext \
+    && mv /tmp/envsubst /usr/local/bin/ \
+# Bring in tzdata so users could set the timezones through the environment
+# variables
+    && apk add --no-cache tzdata
+
+# Upgrade software to latest version
+# ##############################################################################
+RUN apk upgrade
+
+# smoke test
+# ##############################################################################
+RUN envsubst -V \
+    && nginx -V \
+    && nginx -t \
+    && luajit -v
+
+EXPOSE 80 443
+
+
+# Override stop signal to stop process gracefully
+STOPSIGNAL SIGQUIT
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["/usr/local/openresty/bin/openresty", "-c", "/etc/nginx/nginx.conf" ,"-g", "daemon off;"]
