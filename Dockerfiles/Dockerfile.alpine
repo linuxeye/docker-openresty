@@ -19,6 +19,7 @@ ARG RESTY_PCRE_BUILD_OPTIONS="--enable-jit"
 ARG RESTY_PCRE_SHA256="4e6ce03e0336e8b4a3d6c2b70b1c5e18590a5673a98186da90d4f33c23defc09"
 ARG RESTY_J="1"
 ARG VER_GEOIP="3.4"
+ARG VER_NGX_CACHE_PURGE="2.3"
 ARG RESTY_CONFIG_OPTIONS="\
     --with-compat \
     --with-file-aio \
@@ -61,6 +62,7 @@ ARG RESTY_CONFIG_OPTIONS="\
     --add-dynamic-module=/tmp/ngx_http_geoip2_module-${VER_GEOIP} \
     --add-dynamic-module=/tmp/ngx_brotli \
     --add-dynamic-module=/tmp/ngx-fancyindex \
+    --add-dynamic-module=/tmp/ngx_cache_purge-${VER_NGX_CACHE_PURGE} \
     "
 ARG RESTY_CONFIG_OPTIONS_MORE=""
 ARG RESTY_LUAJIT_OPTIONS="--with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT'"
@@ -165,6 +167,8 @@ RUN apk add --no-cache --virtual .build-deps \
     && git clone https://github.com/aperezdc/ngx-fancyindex.git \
     && curl -fSL https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz -o ngx_http_geoip2_module-${VER_GEOIP}.tar.gz \
     && tar xzf ngx_http_geoip2_module-${VER_GEOIP}.tar.gz \
+    && curl -fSL https://github.com/FRiCKLE/ngx_cache_purge/archive/${VER_NGX_CACHE_PURGE}.tar.gz -o ngx_cache_purge-${VER_NGX_CACHE_PURGE}.tar.gz \
+    && tar xzf ngx_cache_purge-${VER_NGX_CACHE_PURGE}.tar.gz \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
     && cd /tmp/openresty-${RESTY_VERSION} \
@@ -178,7 +182,9 @@ RUN apk add --no-cache --virtual .build-deps \
         openssl-${RESTY_OPENSSL_VERSION}.tar.gz openssl-${RESTY_OPENSSL_VERSION} \
         pcre-${RESTY_PCRE_VERSION}.tar.gz pcre-${RESTY_PCRE_VERSION} \
         openresty-${RESTY_VERSION}.tar.gz openresty-${RESTY_VERSION} \
-        ngx_http_geoip2_module-${VER_GEOIP} ngx_brotli ngx-fancyindex \
+        ngx_http_geoip2_module-${VER_GEOIP}.tar.gz ngx_http_geoip2_module-${VER_GEOIP} \
+        ngx_cache_purge-${VER_NGX_CACHE_PURGE}.tar.gz ngx_cache_purge-${VER_NGX_CACHE_PURGE} \
+        ngx_brotli ngx-fancyindex \
     && apk del .build-deps \
     && addgroup -g 1000 -S $MY_GROUP \
     && adduser -S -D -H -u 1000 -h /var/cache/nginx -s /sbin/nologin -G $MY_GROUP -g $MY_GROUP $MY_USER \
