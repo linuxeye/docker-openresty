@@ -166,7 +166,7 @@ RUN apk add --no-cache --virtual .build-deps \
     && git clone https://github.com/aperezdc/ngx-fancyindex.git \
     && curl -fSL https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz -o ngx_http_geoip2_module-${VER_GEOIP}.tar.gz \
     && tar xzf ngx_http_geoip2_module-${VER_GEOIP}.tar.gz \
-    && git clone https://github.com/Danrancan/ngx_cache_purge_dynamic.git /tmp/ngx_cache_purge
+    && git clone https://github.com/Danrancan/ngx_cache_purge_dynamic.git /tmp/ngx_cache_purge \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
     && cd /tmp/openresty-${RESTY_VERSION} \
