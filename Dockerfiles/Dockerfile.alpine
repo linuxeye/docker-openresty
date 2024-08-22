@@ -195,7 +195,7 @@ ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/
 
 # Copy nginx configuration files
 COPY --chown=1000:1000 tpl/docker-entrypoint.d /docker-entrypoint.d
-COPY --chown=1000:1000 tpl/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=1000:1000 tpl/0.default.conf /etc/nginx/conf.d/0.default.conf
 COPY --chown=1000:1000 tpl/docker-entrypoint.sh /
 COPY --chown=1000:1000 tpl/nginx.conf /etc/nginx/nginx.conf
 #COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
