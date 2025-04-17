@@ -9,7 +9,7 @@ LABEL maintainer="Justo <lj2007331@gmail.com>"
 
 # Docker Build Arguments
 ARG RESTY_IMAGE_BASE="alpine"
-ARG RESTY_VERSION="1.27.1.1"
+ARG RESTY_VERSION="1.27.1.2"
 
 # https://github.com/openresty/openresty-packaging/blob/master/alpine/openresty-openssl3/APKBUILD
 ARG RESTY_OPENSSL_VERSION="3.0.15"

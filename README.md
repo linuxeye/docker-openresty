@@ -78,4 +78,4 @@ In case you seek help, go and visit the community pages.
 **Findme:**
 **🐋** [bypanel](https://hub.docker.com/r/bypanel/)
 
-Thanks **[@openresty](https://github.com/openresty)** **[@cytopia](https://github.com/cytopia)**
+Thanks **[@openresty](https://github.com/openresty)**
